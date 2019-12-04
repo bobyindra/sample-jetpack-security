@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Sample Jetpack Security</string>
+    <string name="show_client_id">Show Client ID</string>
+    <string name="show_server_id">Show Server ID</string>
+    <string name="client_id_result">Client Id is : %1$s</string>
+    <string name="server_id_result">Server Id is : %1$s</string>
+</resources>
