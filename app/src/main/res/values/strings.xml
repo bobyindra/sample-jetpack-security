@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name">Sample Jetpack Security</string>
-    <string name="show_client_id">Show Client ID</string>
-    <string name="show_server_id">Show Server ID</string>
-    <string name="client_id_result">Client Id is : %1$s</string>
-    <string name="server_id_result">Server Id is : %1$s</string>
+    <string name="hola">Hola!\nWelcome to Teras Bhinneka X ID Android Developer</string>
+    <string name="write">Write</string>
+    <string name="read">Read</string>
+    <string name="time_to_write">Time to write: %1$sms</string>
+    <string name="time_to_read">Time to read: %1$sms</string>
+    <string name="encrypted_value">Encrypted Value:\n%1$s</string>
 </resources>

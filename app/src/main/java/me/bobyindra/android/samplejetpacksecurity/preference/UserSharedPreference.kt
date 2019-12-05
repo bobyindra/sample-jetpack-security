@@ -8,16 +8,15 @@ import me.bobyindra.android.samplejetpacksecurity.helper.MyMasterKey
 /**
  * Created by Boby-IP on December 05, 2019
  */
-class ServerSharedPreference {
+class UserSharedPreference {
     companion object {
-        const val CLIENT_ID = "clientId"
-        const val CLIENT_SECRET = "clientSecret"
+        const val USER_EMAIL_KEY = "userEmail"
 
         private val instance by lazy {
-            ServerSharedPreference()
+            UserSharedPreference()
         }
 
-        fun get(): ServerSharedPreference = instance
+        fun get(): UserSharedPreference = instance
     }
 
     private val pref = EncryptedSharedPreferences.create(
@@ -28,20 +27,14 @@ class ServerSharedPreference {
         EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
     )
 
-    fun initKeys() {
+    fun setUserEmail(email: String) {
         pref.edit {
-            // Update Secret Value
-            putString(CLIENT_ID, "test1234ClientID")
-            putString(CLIENT_SECRET, "test5678ClientSECRET")
+            putString(USER_EMAIL_KEY, email)
             commit()
         }
     }
 
-    fun getClientID(): String {
-        return pref.getString(CLIENT_ID, "").toString()
-    }
-
-    fun getServerID(): String {
-        return pref.getString(CLIENT_SECRET, "").toString()
+    fun getUserEmail(): String? {
+        return pref.getString(USER_EMAIL_KEY, "")
     }
 }

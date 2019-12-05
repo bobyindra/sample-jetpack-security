@@ -1,55 +1,86 @@
 package me.bobyindra.android.samplejetpacksecurity
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.security.crypto.EncryptedFile
+import androidx.core.content.edit
+import androidx.security.crypto.EncryptedSharedPreferences
 import kotlinx.android.synthetic.main.activity_main.*
 import me.bobyindra.android.samplejetpacksecurity.helper.MyMasterKey
-import me.bobyindra.android.samplejetpacksecurity.preference.ServerSharedPreference
+import me.bobyindra.android.samplejetpacksecurity.helper.hideKeyboard
+import me.bobyindra.android.samplejetpacksecurity.helper.highlight
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var pref: SharedPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        initEncryptedSharedPreference()
         initView()
     }
 
     private fun initView() {
-        buttonShowClientId.setOnClickListener {
-            textResult.text =
-                getString(R.string.client_id_result, ServerSharedPreference.get().getClientID())
+        buttonWriteValue.setOnClickListener {
+            writeValue()
         }
 
-        buttonShowServerId.setOnClickListener {
-            textResult.text =
-                getString(R.string.server_id_result, ServerSharedPreference.get().getServerID())
+        buttonReadValue.setOnClickListener {
+            readValue()
         }
     }
 
-    private fun getEncryptedFile(): EncryptedFile {
-        val secretFile = File("", "")
-        return EncryptedFile.Builder(
-            secretFile,
-            applicationContext,
+    private fun initEncryptedSharedPreference() {
+        pref = EncryptedSharedPreferences.create(
+            PREF_NAME,
             MyMasterKey.getMasterKey(),
-            EncryptedFile.FileEncryptionScheme.AES256_GCM_HKDF_4KB
+            JetpackSecurityApplication.get(),
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
         )
-            .setKeysetAlias("file_key") // optional
-            .setKeysetPrefName("secret_shared_prefs") // optional
-            .build()
     }
 
-    private fun writeEncryptedFile() {
-        getEncryptedFile().openFileOutput().use { outputStream ->
-            // Write data from your encrypted file
+    private fun writeValue() {
+        val startTs = System.currentTimeMillis()
+
+        pref.edit {
+            putString(DATA_KEY, editInsertValue.text.toString())
+            commit()
+        }
+
+        val endTs = System.currentTimeMillis()
+        textTimeWrite.text = getString(R.string.time_to_write).format(endTs - startTs)
+
+        hideKeyboard()
+        showRawFile()
+    }
+
+    private fun readValue() {
+        val startTs = System.currentTimeMillis()
+
+        val value = pref.getString(DATA_KEY, "")
+        textReadValue.text = value
+
+        val endTs = System.currentTimeMillis()
+        textTimeRead.text = getString(R.string.time_to_write).format(endTs - startTs)
+
+        hideKeyboard()
+        showRawFile()
+    }
+
+    private fun showRawFile() {
+        val preferencesFile = File("${applicationInfo.dataDir}/shared_prefs/$PREF_NAME.xml")
+        if (preferencesFile.exists()) {
+            textEncryptedValue.text = preferencesFile.readText().highlight()
+        } else {
+            textEncryptedValue.text = ""
         }
     }
 
-    private fun readEncryptedFile() {
-        getEncryptedFile().openFileInput().use { inputStream ->
-            // Read data from your encrypted file
-        }
+    companion object {
+        const val DATA_KEY = "DATA_KEY"
+        const val PREF_NAME = "data_secret_prefs"
     }
 }
